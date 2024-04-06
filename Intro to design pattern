@@ -1,0 +1,97 @@
+#include <iostream>
+using namespace std;
+class FlyBehaviour
+{
+  public:
+    virtual void fly() = 0;
+};
+class FlyWithWings : public FlyBehaviour
+{
+    public:
+      void fly(){
+          cout<<"I am Flying.."<<endl;
+      }
+};
+class FlyNoWay : public FlyBehaviour
+{
+    public:
+      void fly(){
+          cout<<"I can't Fly..I am sad"<<endl;
+      }
+};
+class QuackBehaviour
+{
+  public:
+    virtual void quack() = 0;
+};
+class Quack : public QuackBehaviour
+{
+    public:
+      void quack(){
+          cout<<"Quack Quack.."<<endl;
+      }
+};
+class MuteQuack : public QuackBehaviour
+{
+    public:
+      void quack(){
+          cout<<"<<....Silence.....>>"<<endl;
+      }
+};
+class SquakQuack : public QuackBehaviour
+{
+    public:
+      void quack(){
+          cout<<"Sqeak Sqeak...."<<endl;
+      }
+};
+class duck
+{
+    public:
+        FlyBehaviour *flybehaviour;
+        QuackBehaviour *quackbehaviour;
+    public:
+        duck(){
+            cout<<"DUck ctr called"<<endl;
+        }
+        void performFly(){
+            flybehaviour->fly();
+        }
+        void performQuack(){
+            cout<<"performQuack called"<<endl;
+            quackbehaviour->quack();
+        }
+        void swim(){
+            cout<<"all ducks swim"<<endl;
+        }
+        
+};
+class mallardDuck: public duck
+{
+    public:
+        mallardDuck(){
+            cout<<"mallardDuck ctr called"<<endl;
+            quackbehaviour = new Quack();
+        }
+};
+class redHeadDuck: public duck
+{
+    public:
+        redHeadDuck(){
+            cout<<"redHeadDuck ctr called"<<endl;
+        }
+};
+class rubberDuck: public duck
+{
+    public:
+        rubberDuck(){
+            cout<<"rubberDuck ctr called"<<endl;
+        }
+};
+int main()
+{
+    duck *d = new mallardDuck();
+    d->performQuack();
+
+    return 0;
+}
