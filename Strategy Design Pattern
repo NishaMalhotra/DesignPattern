@@ -1,6 +1,14 @@
 /*
 Thumb Rule: Creating systems using composition gives you a lot more flexibility. Not only does it let you encapsulate a family of algorithms into their own set 
 of classes, but it also lets you change behavior at runtime as long as the object you’re composing with implements the correctbehavior interface.
+
+**************************************************************
+1) Use the Strategy pattern when you want to use different variants of an algorithm within an object and be able to switch from one algorithm to another during 
+runtime.  The Strategy pattern lets you indirectly alter the object’s behavior at runtime by associating it with different sub-objects which can perform specific 
+sub-tasks in different ways.
+2)  Use the Strategy when you have a lot of similar classes that only differ in the way they execute some behavior.
+3) Use the pattern to isolate the business logic of a class from the implementation details of algorithms that may not be as important in the context of that logic. The Strategy pattern lets you do away with such a conditional by extracting all algorithms into separate classes, all of which implement the same interface. The original object delegates execution to one of these objects, instead of implementing all variants of the algorithm.
+*****************************************************************
 */
 #include <iostream>
 using namespace std;
