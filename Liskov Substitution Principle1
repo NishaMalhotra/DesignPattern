@@ -1,0 +1,36 @@
+/*
+Program will generate exeception.
+As when object of penguine is passed it generate exception, functionality is reduce as compare to base class.
+*/
+#include <iostream>
+using namespace std;
+class Bird 
+{
+  public:
+    virtual void fly() = 0;
+};
+class crow:public Bird
+{
+    public:
+        void fly()
+        {
+            cout<<"I can FLY"<<endl;
+        }
+};
+class penguine:public Bird
+{
+    public:
+        void fly()
+        {
+            throw runtime_error("penguine dont fly");
+        }
+};
+int main()
+{
+    Bird* b = new crow();
+    b->fly();
+
+    Bird*p = new penguine();
+    p->fly();
+    return 0;
+}
