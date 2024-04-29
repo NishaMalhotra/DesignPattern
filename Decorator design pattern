@@ -1,5 +1,7 @@
 /******************************************************************************
-
+Decorator design pattern - follows Open close design principle, new decorators can be added without modifying existing code
+Uses composition, You can compose objects with different decorators to achieve the desired functionality, avoiding the drawbacks of inheritance, such as tight coupling and rigid hierarchies.
+Decorators can be applied or removed at runtime, providing dynamic behavior modification for objects.
 
 
 *******************************************************************************/
@@ -84,5 +86,11 @@ int main()
     BasePizza* e = new ExtraCheese(new Margharita());
     int magPrice = e->cost();
     cout<<"Margharita +ExtraCheese price:"<<magPrice<<endl;
+    
+    
+    //Now need price for Margharita+ cheese + Mushrooms
+    BasePizza* e2 = new Mushrooms(new ExtraCheese(new Margharita()));
+    int mushRoom = e2->cost();
+    cout<<"Margharita +ExtraCheese price:"<<mushRoom<<endl;
     return 0;
 }
