@@ -1,0 +1,47 @@
+/*
+In this class now, crow inherits from FlyingBirds and penguine from birds .
+when we try to call fly from penguine object, it will give compiler error.
+*/
+#include <iostream>
+using namespace std;
+class Bird 
+{
+  public:
+    virtual bool canfly() = 0;
+};
+class FlyingBirds: public Bird
+{
+  public:
+    bool canfly()
+    {
+        return true;
+    }
+    virtual void fly() = 0;
+};
+class crow:public FlyingBirds
+{
+    public:
+        void fly()
+        {
+            cout<<"CROW can FLY"<<endl;
+        }
+};
+class penguine:public Bird
+{
+    public:
+        bool canfly()
+        {
+            return false;
+        }
+};
+int main()
+{
+    FlyingBirds* b = new crow();
+    b->fly();
+
+    FlyingBirds* p = new penguine();
+    p->fly();
+    //Bird*p = new penguine();
+    //p->canfly();
+    return 0;
+}
