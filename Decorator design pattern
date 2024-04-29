@@ -1,0 +1,88 @@
+/******************************************************************************
+
+
+
+*******************************************************************************/
+#include <iostream>
+using namespace std;
+//abstract class
+class BasePizza
+{
+    public: 
+        virtual int cost() = 0;
+};
+class Farmhouse : public BasePizza //standard pizza which are available, inheritance, IS-A relationship with BasePizza
+{
+    public:
+        int cost()
+        {
+            return 200;
+        }
+};
+class vegDelight : public BasePizza//IS-A relationship with BasePizza
+{
+    public:
+        int cost()
+        {
+            return 300;
+        }
+};
+class Margharita : public BasePizza//IS-A relationship with BasePizza
+{
+    public:
+        int cost()
+        {
+            return 400;
+        }
+};
+
+//Now comes the decorator, like we can add different toppings like capsium, cheese etc.
+//Is A relationship with BasePizza
+//As BasePizza is abstract class so all methods of BasePizza has to be initialised either this or any of its child classes.
+class ToppingDecorator :public BasePizza //it extends BasePizza as it will be having a BasePizza on which topping will be added.
+{
+    //cost isn't initialised here, so has to be initialised by child class
+    //this is also abstract now.
+};
+class ExtraCheese : public ToppingDecorator
+{
+    private:
+        BasePizza* basePizzaObject; //we will be taking pointer, as object cant be created for abstract class.
+    public:
+        ExtraCheese(BasePizza* pizza)
+        {
+            this->basePizzaObject = pizza;
+        }
+        int cost()
+        {
+            return this->basePizzaObject->cost() + 10;
+        }
+};
+class Mushrooms : public ToppingDecorator
+{
+    private:
+        //Has A relationship is created with BasePizza and decorator class
+        BasePizza* basePizzaObject; //we will be taking pointer, as object cant be created for abstract class.
+    public:
+        Mushrooms(BasePizza* pizza)
+        {
+            this->basePizzaObject = pizza;
+        }
+        int cost()
+        {
+            return this->basePizzaObject->cost() + 15;
+        }
+};
+int main()
+{
+    /*
+    BasePizza*b = new Farmhouse();
+    int price = b->cost();
+    cout<<"price:"<<price<<endl;
+    */
+    //Lets suppose we want cost of Margharita + cheese 
+    BasePizza* e = new ExtraCheese(new Margharita());
+    int magPrice = e->cost();
+    cout<<"Margharita +ExtraCheese price:"<<magPrice<<endl;
+    return 0;
+}
