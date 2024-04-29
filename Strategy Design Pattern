@@ -3,11 +3,29 @@ Thumb Rule: Creating systems using composition gives you a lot more flexibility.
 of classes, but it also lets you change behavior at runtime as long as the object you’re composing with implements the correctbehavior interface.
 
 **************************************************************
+When to use strategy pattern ? 
 1) Use the Strategy pattern when you want to use different variants of an algorithm within an object and be able to switch from one algorithm to another during 
 runtime.  The Strategy pattern lets you indirectly alter the object’s behavior at runtime by associating it with different sub-objects which can perform specific 
 sub-tasks in different ways.
 2)  Use the Strategy when you have a lot of similar classes that only differ in the way they execute some behavior.
-3) Use the pattern to isolate the business logic of a class from the implementation details of algorithms that may not be as important in the context of that logic. The Strategy pattern lets you do away with such a conditional by extracting all algorithms into separate classes, all of which implement the same interface. The original object delegates execution to one of these objects, instead of implementing all variants of the algorithm.
+3) Use the pattern to isolate the business logic of a class from the implementation details of algorithms that may not be as important in the context of that logic.
+The Strategy pattern lets you do away with such a conditional by extracting all algorithms into separate classes, all of which implement the same interface. 
+The original object delegates execution to one of these objects, instead of implementing all variants of the algorithm.
+
+Pros and Cons of strategy design pattern? 
+Pros: 
+You can swap algorithms used inside an object at runtime.
+•You can isolate the implementation details of an algorithm from the code that uses it.
+•You can replace inheritance with composition.
+•Open/Closed Principle. You can introduce new strategies without having to change the context.
+
+Cons:
+
+•If you only have a couple of algorithms and they rarely change, there’s no real reason to overcomplicate the program with new classes and interfaces that come along with the pattern.
+•Clients must be aware of the differences between strategies to be able to select a proper one.
+•A lot of modern programming languages have functional type support that lets you implement different versions of an algorithm inside a set of anonymous functions. Then you could use these functions exactly as you’d have used the strategy objects, but without bloating your code with extra classes and interfaces.
+
+
 *****************************************************************
 */
 #include <iostream>
@@ -120,7 +138,7 @@ class ModelDuck: public duck
 int main()
 {
     duck *d = new ModelDuck();
-    d->setQuackBehaviour(new MuteQuack());
+    d->setQuackBehaviour(new MuteQuack());//behaviour decided at run time.
     d->performQuack();
     return 0;
 }
