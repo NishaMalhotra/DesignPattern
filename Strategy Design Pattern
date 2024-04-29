@@ -1,11 +1,13 @@
 
 #include <iostream>
 using namespace std;
+//Abstract class created using pure virtual function
 class FlyBehaviour
 {
   public:
     virtual void fly() = 0;
 };
+//FlyWithWings derived from FlyBehaviour, has to implement fly method else this also will be converted to Abstract class
 class FlyWithWings : public FlyBehaviour
 {
     public:
@@ -13,6 +15,7 @@ class FlyWithWings : public FlyBehaviour
           cout<<"I am Flying.."<<endl;
       }
 };
+//FlyNoWay derived from FlyBehaviour, has to implement fly method else this also will be converted to Abstract class
 class FlyNoWay : public FlyBehaviour
 {
     public:
@@ -20,6 +23,7 @@ class FlyNoWay : public FlyBehaviour
           cout<<"I can't Fly..I am sad"<<endl;
       }
 };
+//Abstract class created using pure virtual function
 class QuackBehaviour
 {
   public:
@@ -49,7 +53,7 @@ class SquakQuack : public QuackBehaviour
 class duck
 {
     public:
-        FlyBehaviour *flybehaviour;
+        FlyBehaviour *flybehaviour; //obect cant be created, abstract class but pointers can be created.
         QuackBehaviour *quackbehaviour;
     public:
         duck(){
@@ -77,7 +81,7 @@ class mallardDuck: public duck
     public:
         mallardDuck(){
             cout<<"mallardDuck ctr called"<<endl;
-            quackbehaviour = new Quack();
+            quackbehaviour = new Quack(); //behaviour set in ctr, how it should behave. 
         }
 };
 class redHeadDuck: public duck
