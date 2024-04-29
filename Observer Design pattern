@@ -1,0 +1,99 @@
+/******************************************************************************
+Observer design pattern - Using Push Model
+Push Model - Notification will be sent to all registered observers in case any change is there. 
+Pull Model - in this model, observer will be pulling information only when they need it rather than subscriber sending all information which is available to them which actually observer might not need it. 
+*******************************************************************************/
+#include <iostream>
+#include<list>
+using namespace std;
+class ObserverInterface; //forward declaration is needed as SubjectInterface is using ObserverInterface without defining it before
+class SubjectInterface //abstract class is created, which enforce register and remove should be invoked.
+{
+  public:
+    virtual ~SubjectInterface(){}; 
+    virtual void registerObserver(ObserverInterface *o) = 0;
+    virtual void removeObserver(ObserverInterface *o) = 0;
+    virtual void notifyObserver() = 0;
+};
+class ObserverInterface //ObserverInterface enforces update method as it has to update all of its observers about latest updates
+{
+    public:
+        virtual ~ObserverInterface(){};
+        virtual void update(int updatedValue)= 0;
+};
+
+class Observer: public ObserverInterface
+{
+    private:
+        int val;
+        SubjectInterface* subj;
+        static int Obscount;
+    public:
+        Observer()
+        {
+            
+        }
+        Observer(SubjectInterface* subj)
+        {
+            cout<<"Observer "<<Obscount <<" registersed Successfully"<<endl;
+            this->subj = subj;
+            subj->registerObserver(this); //current object register
+            Obscount+=1;
+        }
+        void update(int val)
+        {
+           this->val = val;
+           Display();
+        }
+       void Display()
+       {
+           cout<<"Observer " <<"says MY new values are:"<<val<<endl;
+       }
+        
+};
+int Observer::Obscount = 0;
+class Subject : public SubjectInterface
+{
+    private:
+        list<ObserverInterface*> obs;
+        int value;
+    public:
+        void registerObserver(ObserverInterface *o)
+        {
+            obs.push_back(o);
+        }
+        void removeObserver(ObserverInterface *o)
+        {
+            auto itr = obs.begin();
+            for (auto itr = obs.begin(); itr != obs.end(); itr++) { 
+                if(*itr == o)
+                    break;
+            } 
+            obs.erase(itr);
+        }
+        void notifyObserver()
+        {
+            cout<<"No of observer:"<<obs.size()<<endl;
+            for(auto itr = obs.begin(); itr!=obs.end(); ++itr)
+            {
+                cout<<"Notication sending to observer"<<endl;
+                (*itr)->update(value);
+            }
+        }
+        void setmeasurements(int val)
+        {
+            this->value = val;
+            notifyObserver();
+        }
+};
+int main()
+{
+    Subject* subj = new Subject();
+    Observer* obs1 = new Observer(subj);
+    Observer* obs2 = new Observer(subj);
+    subj->setmeasurements(10);
+    
+    
+    //subj->setmeasurements(20);
+    return 0;
+}
