@@ -1,4 +1,7 @@
-
+/*
+Thumb Rule: Creating systems using composition gives you a lot more flexibility. Not only does it let you encapsulate a family of algorithms into their own set 
+of classes, but it also lets you change behavior at runtime as long as the object you’re composing with implements the correctbehavior interface.
+*/
 #include <iostream>
 using namespace std;
 //Abstract class created using pure virtual function
