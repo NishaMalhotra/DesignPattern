@@ -1,0 +1,52 @@
+/******************************************************************************
+
+Benefit - 
+1) can be used in gui,for creatig UI components like buttons, windows dialogs. Different OS may have different implmentations.
+2) When building extensible software systems, the Factory Method Pattern can be used to create and manage plugin instances dynamically.
+
+*******************************************************************************/
+#include <iostream>
+using namespace std;
+
+//abstract class 
+class Shape
+{
+    public:
+        virtual void draw() = 0;
+        virtual ~Shape(){} //virtual destructor
+};
+class circle : public Shape
+{
+  public:
+    void draw()
+    {
+        cout<<"circle"<<endl;
+    }
+};
+class square : public Shape
+{
+  public:
+    void draw()
+    {
+        cout<<"square"<<endl;
+    }
+};
+//abstract FACTORY class
+class shapefactory
+{
+  public:
+    Shape* getShape(string input)
+    {
+        if(input == "c")
+            return new circle();
+        else 
+            return new circle();
+    }
+};
+int main()
+{
+    shapefactory sf;
+    Shape*s = sf.getShape("c");
+    s->draw();
+    return 0;
+}
