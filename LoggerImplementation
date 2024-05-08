@@ -5,6 +5,7 @@ it and so on..
 ATM , Vending machine, logger all uses chain of responsibility design pattern.
 
 *******************************************************************************/
+
 #include <iostream>
 using namespace std;
 enum loglevel {DEBUG, INFO, ERROR, NONE};
@@ -22,16 +23,16 @@ class debugHandler:public logger
     public:
         debugHandler(logger* obj)
         {
-            cout<<"debug ctr:"<<endl;
+            //cout<<"debug ctr:"<<endl;
             this->nextlogger = obj;//next is error handler
         }
         void logMessage(loglevel level,const string& msg)
         {
             if(level == DEBUG)
-                cout<<"debug handler invoked";
+                cout<<"debug handler invoked"<<endl;
             else
             {
-                cout<<"next parent will try to handle"<<endl;
+                //cout<<"next parent will try to handle"<<endl;
                 nextlogger->logMessage(level,msg);
             }
         }
@@ -41,16 +42,16 @@ class errorHandler:public logger
     public:
         errorHandler(logger* obj)
         {
-            cout<<"error ctr:"<<endl;
+            //cout<<"error ctr:"<<endl;
             this->nextlogger = obj;//null is next
         }
         void logMessage(loglevel level,const string& msg)
         {
             if(level == ERROR)
-                cout<<"error handler invoked";
+                cout<<"error handler invoked"<<endl;
             else
             {
-                cout<<"next debug will try to handle"<<endl;
+                //cout<<"next debug will try to handle"<<endl;
                 nextlogger->logMessage(level,msg);
             }
                 
@@ -61,24 +62,41 @@ class InfoHandler:public logger
     public:
         InfoHandler(logger* obj)//ctr for next logger if this fails
         {
-            cout<<"info ctr:"<<endl;
+            //cout<<"info ctr:"<<endl;
             this->nextlogger = obj;//debug handler is next
         }
         void logMessage(loglevel level,const string& msg)
         {
             if(level == INFO)
-                cout<<"info handler invoked";
+                cout<<"info handler invoked"<<endl;
             else
             {
-                cout<<"next error will try to handle"<<endl;
+                //cout<<"next error will try to handle"<<endl;
                 nextlogger->logMessage(level,msg);
             }
                 
         }
 };
+class NoneHandler:public logger 
+{
+    public:
+        NoneHandler(logger* obj)//ctr for next logger if this fails
+        {
+            //cout<<"info ctr:"<<endl;
+            this->nextlogger = obj;//debug handler is next
+        }
+        void logMessage(loglevel level,const string& msg)
+        {
+            cout<<"Cant be handled"<<endl;
+                
+        }
+};
 int main()
 {
-    logger* log = new InfoHandler(new errorHandler(new debugHandler(NULL)));
+    logger* log = new InfoHandler(new errorHandler(new debugHandler(new NoneHandler(NULL))));
     log->logMessage(loglevel::DEBUG,"information msg");
+    log->logMessage(loglevel::ERROR,"information msg");
+    log->logMessage(loglevel::INFO,"information msg");
+    log->logMessage(loglevel::NONE,"information msg");
     return 0;
 }
