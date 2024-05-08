@@ -3,6 +3,11 @@ Decorator design pattern - follows Open close design principle, new decorators c
 Uses composition, You can compose objects with different decorators to achieve the desired functionality, avoiding the drawbacks of inheritance, such as tight coupling and rigid hierarchies.
 Decorators can be applied or removed at runtime, providing dynamic behavior modification for objects.
 
+Can be used for notifications, where we have one base class Notifier, and we have different type of notiications like slack, email, facebook.
+Let suppose in future you want to have slack+email or slack+facebook. how many classes you would extend? Inheritance is static, we cant alter behavior at run time.
+Inheritance dont behavior inherit from multiple classes at same time. 
+One way to overcome is composition.
+Solution is decorator. 
 
 *******************************************************************************/
 #include <iostream>
