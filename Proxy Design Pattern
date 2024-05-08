@@ -1,0 +1,51 @@
+/******************************************************************************
+
+Proxy Design Pattern -
+We can multiple number of proxies 
+Client --> ProxyA --> Proxy B --> Proxy C --> Real Object
+We can do marshalling & unmarshalling here. 
+
+Pros :
+1) can be used whereever we need some access control.
+2) If we need some cachine, proxy can be used.
+3) After some operation we need some preprocessing or postprocessing, for that proxy is one of the best design pattern. 
+*******************************************************************************/
+#include <iostream>
+using namespace std;
+class EmployeeInterface
+{
+  public:
+    virtual void print(string client) = 0;
+};
+class Employee:public EmployeeInterface
+{
+    public:
+        void print(string client)
+        {
+            cout<<"meal1"<<endl;
+        }
+};
+class EmployeeProxy:public EmployeeInterface
+{
+    private:
+        Employee* e;
+    public:
+        EmployeeProxy()
+        {
+            e = new Employee();
+        }
+        void print(string client)
+        {
+            if(client == "ADMIN")
+                e->print(client);
+            else
+                cout<<"Access Denied"<<endl;
+        }
+};
+
+int main()
+{
+    EmployeeInterface* e = new EmployeeProxy();
+    e->print("USER");
+    return 0;
+}
