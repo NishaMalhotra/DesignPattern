@@ -16,5 +16,6 @@
 ![image](https://github.com/NishaMalhotra/DesignPattern/assets/39948171/5985e52a-ec92-4e96-ad76-4a821d5a8d82)
 
 
-#RateLimiter: 
+# RateLimiter: 
+
 ![image](https://github.com/NishaMalhotra/DesignPattern/assets/39948171/e706f7a8-44a3-4b86-83b3-bb0e86a253d4)
