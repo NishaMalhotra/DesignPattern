@@ -1,0 +1,54 @@
+#include <iostream>
+#include <cmath>
+#include <chrono>
+
+using namespace std;
+
+const double MAX_BUCKET_SIZE = 3;
+const int REFILL_RATE = 1;
+
+class TokenBucket {
+private:
+    double currentBucketSize;
+    int lastRefillTimestamp;
+
+public:
+    TokenBucket() : currentBucketSize(3), lastRefillTimestamp(0) {}
+
+    bool allowRequest(double tokens) {
+        refill(); //refill called to check if any new tokens needs to be added before processing this request ? 
+
+        if (currentBucketSize >= tokens) {
+            currentBucketSize -= tokens;
+            return true;
+        }
+
+        return false;
+    }
+
+private:
+    int getCurrentTimeInNanoseconds() {
+        return chrono::duration_cast<chrono::nanoseconds>(
+            chrono::system_clock::now().time_since_epoch()
+        ).count();
+    }
+
+    void refill() {
+        int nowTime = getCurrentTimeInNanoseconds();
+        //also time diff is in nanoseconds and REFILL_RATE which is given in second so conversion is needed
+        int tokensToAdd = (nowTime - lastRefillTimestamp) * REFILL_RATE / 1e9; //tis much token can be added between last request and this current request. 
+        currentBucketSize = min(currentBucketSize + tokensToAdd, MAX_BUCKET_SIZE);
+        lastRefillTimestamp = nowTime;
+    }
+};
+
+int main() {
+    TokenBucket obj;
+
+    cout << "Request processed: " << boolalpha << obj.allowRequest(1) << endl;
+    cout << "Request processed: " << boolalpha << obj.allowRequest(1) << endl;
+    cout << "Request processed: " << boolalpha << obj.allowRequest(1) << endl;
+    cout << "Request processed: " << boolalpha << obj.allowRequest(1) << endl;
+
+    return 0;
+}
