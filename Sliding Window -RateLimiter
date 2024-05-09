@@ -1,0 +1,50 @@
+/* 
+Sliding Window Algorithm
+It keeps track of timestamp at which any request has arrived. If we get more than that request in current window(in this case window size is kept 1) , we reject that requst.
+
+*/
+#include <iostream>
+#include <deque>
+#include <chrono>
+#include <thread>
+using namespace std;
+class RateLimiter {
+private:
+    std::deque<std::chrono::time_point<std::chrono::steady_clock>> window;
+    int windowSize; // Number of requests allowed in the window
+    int rateLimit; // Requests per second
+public:
+    RateLimiter(int windowSize, int rateLimit) : windowSize(windowSize), rateLimit(rateLimit) {}
+
+    bool allowRequest() {
+        std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
+        // Remove old entries from the window
+        while (!window.empty() && window.front() < now - std::chrono::seconds(1)) {
+            window.pop_front();
+        }
+
+        // Check if number of requests in the window exceeds the limit
+        if (window.size() < windowSize) {
+            window.push_back(now);
+            return true;
+        }
+
+        return false;
+    }
+};
+
+int main() {
+    RateLimiter limiter(5, 3); // Allow 3 requests per second, with a window size of 5
+
+    for (int i = 0; i < 10; ++i) {
+        if (limiter.allowRequest()) {
+            std::cout << "Request " << i + 1 << ": Allowed" << std::endl;
+        } else {
+            std::cout << "Request " << i + 1 << ": Denied" << std::endl;
+        }
+
+        //std::this_thread::sleep_for(std::chrono::milliseconds(200)); // Simulate requests spaced apart
+    }
+
+    return 0;
+}
