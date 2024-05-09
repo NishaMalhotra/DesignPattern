@@ -1,0 +1,33 @@
+/*
+can also be implemented using queue - FIFO. if space is there it can be accomodated else it will be ignored.
+*/
+#include<bits/stdc++.h>
+using namespace std;
+int main()
+{
+    int no_of_queries, storage, output_pkt_size;
+    int input_pkt_size, bucket_size, size_left;
+
+    storage = 0; // initial packets in the bucket
+    no_of_queries = 4; // total no. of times bucket content is checked
+    bucket_size = 10; // total no. of packets that can be accommodated in the bucket
+    input_pkt_size = 4;// no. of packets that enters the bucket at a time
+    output_pkt_size = 1; // no. of packets that exits the bucket at a time
+    for(int i = 0; i < no_of_queries; i++) //space left
+    {
+        size_left = bucket_size - storage;
+        if(input_pkt_size <= size_left)
+        {
+            storage += input_pkt_size; // update storage 
+            printf("Buffer size= %d out of bucket size= %d\n", storage, bucket_size);
+        }
+        else
+        {
+            printf("Packet loss = %d\n", (input_pkt_size-(size_left)));
+            storage=bucket_size; // full size
+            printf("Buffer size= %d out of bucket size= %d\n", storage, bucket_size);
+        }
+        storage -= output_pkt_size;//9
+    }
+    return 0;
+}
