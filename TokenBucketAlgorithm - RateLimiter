@@ -1,3 +1,8 @@
+/*
+We use the token bucket algorithm to do rate limiting. This algorithm has a centralized bucket host where you take tokens on each request, and slowly drip more tokens into the bucket. 
+If the bucket is empty, reject the request. In our case, every Stripe user has a bucket, and every time they make a request we remove a token from that bucket. 
+We implement our rate limiters using Redis.
+*/
 #include <iostream>
 #include <cmath>
 #include <chrono>
