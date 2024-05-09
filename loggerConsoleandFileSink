@@ -1,0 +1,170 @@
+/******************************************************************************
+
+Welcome to GDB Online.
+  GDB online is an online compiler and debugger tool for C, C++, Python, PHP, Ruby, 
+  C#, OCaml, VB, Perl, Swift, Prolog, Javascript, Pascal, COBOL, HTML, CSS, JS
+  Code, Compile, Run and Debug online from anywhere in world.
+
+*******************************************************************************/
+/******************************************************************************
+
+Chain of responsibility : if one class don't know how to take care of handling, it will pass on responsibility to next class that might probably know how to handle 
+it and so on..
+ATM , Vending machine, logger all uses chain of responsibility design pattern.
+
+*******************************************************************************/
+
+#include <iostream>
+using namespace std;
+enum loglevel {DEBUG, INFO, ERROR, NONE};
+//below is abstract class, object can't be created, it has to be implemented by child class
+
+class logSink
+{
+  public:
+    virtual void addLogs(string msg) = 0;
+};
+class consoleSink : public logSink
+{
+    public:
+        void addLogs(string msg)
+        {
+            cout<<"consoleSink::"<<msg<<endl;
+        }
+};
+class FileSink : public logSink
+{
+    public:
+        void addLogs(string msg)
+        {
+            cout<<"FileSink::"<<msg<<endl;
+        }
+};
+
+//abstract factory class
+class loggerFactory
+{
+    public:
+        //virtual logger* createLogger() = 0;
+        logSink* getFactoryInstance(string type)
+        {
+            if(type == "console")
+                return new consoleSink();
+            if(type == "file")
+                return new FileSink();
+        }
+    
+};
+/*
+class consoleLoggerFactory : public loggerFactory
+{
+    public:
+        logSink* createLogger()
+        {
+            factoryInstance = new consoleSink();
+        }
+};
+class FileLoggerFactory : public loggerFactory
+{
+    public:
+        logSink* createLogger()
+        {
+            factoryInstance = new FileSink();
+        }
+};
+*/
+class logger
+{
+    public:
+        virtual ~logger(){} 
+        virtual void logMessage(loglevel level,const string& msg, logSink* sink) = 0; //pure virtual function
+    protected:
+        logger* nextlogger;
+};
+class debugHandler:public logger
+{
+    public:
+        debugHandler(logger* obj)
+        {
+            this->nextlogger = obj;//next is error handler
+        }
+        void logMessage(loglevel level,const string& msg, logSink* sink)
+        {
+            if(level == DEBUG)
+            {
+                sink->addLogs("debug handler invoked");
+            }
+                
+            else
+            {
+                return nextlogger->logMessage(level,msg,sink);
+            }
+        }
+};
+class errorHandler:public logger 
+{
+    public:
+        errorHandler(logger* obj)
+        {
+            this->nextlogger = obj;//null is next
+        }
+        void logMessage(loglevel level,const string& msg, logSink* sink)
+        {
+            if(level == ERROR)
+            {
+                sink->addLogs("error handler invoked");
+            }
+                
+            else
+            {
+                return nextlogger->logMessage(level,msg, sink);
+            }
+                
+        }
+};
+class InfoHandler:public logger 
+{
+    public:
+        InfoHandler(logger* obj)//ctr for next logger if this fails
+        {
+            this->nextlogger = obj;//debug handler is next
+        }
+        void logMessage(loglevel level,const string& msg, logSink* sink)
+        {
+            if(level == INFO)
+            {
+                sink->addLogs("Info handler invoked");
+            }
+                
+            else
+            {
+                return nextlogger->logMessage(level,msg, sink);
+            }
+                
+        }
+};
+class NoneHandler:public logger 
+{
+    public:
+        
+        NoneHandler(logger* obj)//ctr for next logger if this fails
+        {
+            this->nextlogger = obj;//debug handler is next
+        }
+        void logMessage(loglevel level,const string& msg, logSink* sink)
+        {
+            sink->addLogs("Cant be handled");
+        }
+};
+int main()
+{
+    loggerFactory lf;
+    logSink* sink = lf.getFactoryInstance("file");
+    logger* log = new InfoHandler(new errorHandler(new debugHandler(new NoneHandler(NULL))));
+    log->logMessage(loglevel::DEBUG,"information msg", sink);
+    log->logMessage(loglevel::ERROR,"information msg",sink);
+    log->logMessage(loglevel::INFO,"information msg",sink);
+    log->logMessage(loglevel::NONE,"information msg",sink);
+    
+    return 0;
+}
