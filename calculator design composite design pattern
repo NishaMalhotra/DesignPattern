@@ -1,4 +1,6 @@
-
+/*
+its nothing but recursion on expression
+*/
 #include <iostream>
 #include<list>
 using namespace std;
