@@ -1,0 +1,50 @@
+/*
+Weight conversion implementation
+*/
+#include <iostream>
+using namespace std;
+
+class WeightMachine //abstract class
+{
+    public:
+        virtual ~WeightMachine(){}
+        virtual double getWeightInPounds() = 0;
+};
+class WeightMachineForbabies : public WeightMachine 
+{
+    public:
+        double getWeightInPounds()
+        {
+            return 28;
+        }
+};
+
+class WeightMachineAdapter
+{
+    public:
+        virtual ~WeightMachineAdapter(){}
+        virtual double getWeightInKgs() = 0;
+};
+class WeightMachineAdapterImpl : public WeightMachineAdapter
+{
+    private:
+        WeightMachine* weigh;
+    public:
+        WeightMachineAdapterImpl(WeightMachine* w)
+        {
+            this->weigh = w;
+        }
+        double getWeightInKgs()
+        {
+            double weightInPounds = weigh->getWeightInPounds();
+            double weightInKg = weightInPounds*0.45;
+            return weightInKg;
+        }
+};
+
+int main()
+{
+    WeightMachineAdapter* adapter = new WeightMachineAdapterImpl(new WeightMachineForbabies());
+    cout<<"convert:"<<adapter->getWeightInKgs()<<endl;
+    return 0;
+}
