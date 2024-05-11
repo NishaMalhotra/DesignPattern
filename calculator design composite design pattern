@@ -1,0 +1,70 @@
+
+#include <iostream>
+#include<list>
+using namespace std;
+enum operation {ADD, SUB, MULT, DIV};
+class ArithmeticExpression //abstract class
+{
+    public:
+        ArithmeticExpression(){}
+        virtual int evaluate() = 0;
+};
+class number : public ArithmeticExpression //leaf will be number
+{
+    private:
+        int value;
+    public:
+        number(int value){
+            this->value = value;
+        }
+        int evaluate()
+        {
+            return value;
+        }
+};
+class expression : public ArithmeticExpression //another child can be expression in itself
+{
+    private:
+        ArithmeticExpression* leftVal;
+        ArithmeticExpression* rightVal;
+        operation opt;
+    public:
+        expression(ArithmeticExpression* leftVal, ArithmeticExpression* rightVal, operation opt)
+        {
+            this->leftVal = leftVal;
+            this->rightVal = rightVal;
+            this->opt = opt;
+        }
+        int evaluate()
+        {
+            int value = 0;
+            switch(opt)
+            {
+                case ADD:
+                    value = leftVal->evaluate() + rightVal->evaluate();
+                    break;
+                case SUB:
+                    value = leftVal->evaluate() - rightVal->evaluate();
+                    break;
+                case MULT:
+                    value = leftVal->evaluate()*rightVal->evaluate();
+                    break;
+                case DIV:
+                    value = leftVal->evaluate()/rightVal->evaluate();
+                    break;
+            }
+            return value;
+        }
+};
+int main()
+{
+    //calculate 2* (1+7) = 16
+    ArithmeticExpression* two = new number(2);
+    ArithmeticExpression* one = new number(1);
+    ArithmeticExpression* seven = new number(7);
+    //one, two seven are umber object, they form composite object with addexpression object
+    ArithmeticExpression* addexpression = new expression(one,seven,operation::ADD);//(1+7) expression object creatd
+    ArithmeticExpression* multiexpression = new expression(two, addexpression,operation::MULT); //new object for 2* (1+7) created
+    cout<<"output:"<<multiexpression->evaluate()<<endl; //evaluate called on full expression
+    return 0;
+}
