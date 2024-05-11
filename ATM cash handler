@@ -1,0 +1,122 @@
+/******************************************************************************
+
+ATM - Cash dispenser handler - if we had note 2000, 1000, 500, 10, how exactly it will be handled using chain of respnsibility.
+
+*******************************************************************************/
+#include <iostream>
+using namespace std;
+class base //abstract class
+{
+    protected:
+        int amount;
+        base* nextHandler;
+    public:
+        base(){
+            //cout<<"base can handle"<<endl;
+        }
+        virtual void canServeAmount(int amt) = 0;
+};
+class CantBeServed: public base
+{
+    public:
+        CantBeServed(){}
+        void canServeAmount(int amt)
+        {
+            cout<<"CantBeServed"<<endl;
+        }
+};
+class chain4 : public base//10
+{
+    private:
+        int noOfNotes = 5;
+    public:
+        chain4()
+        {
+            nextHandler = new CantBeServed();  
+        }
+        void canServeAmount(int amt)
+        {
+            //need to serve amt, check if feasible to server? 
+            int noteNeeded = amt/10;
+            if(noteNeeded < noOfNotes)
+            {
+                int remainAmount = amt - (noteNeeded*10);//get 1000
+                cout<<"served "<<noteNeeded<<"for 10 rs"<<endl;
+                if(remainAmount > 0)
+                    nextHandler->canServeAmount(remainAmount);
+            }
+        }
+};
+class chain3 : public base//100
+{
+    private:
+        int noOfNotes =5;
+    public:
+        chain3()
+        {
+            nextHandler = new chain4();
+        }
+        void canServeAmount(int amt)
+        {
+            //need to serve amt, check if feasible to server? 
+            int noteNeeded = amt/100;
+            if(noteNeeded < noOfNotes)
+            {
+                int remainAmount = amt - (noteNeeded*100);//get 1000
+                cout<<"served "<<noteNeeded<<"for 100 rs "<<"remainAmount is: "<<remainAmount<<endl;
+                if(remainAmount >= 0)
+                    nextHandler->canServeAmount(remainAmount);
+            }
+        }
+};
+class chain2 : public base//500
+{
+    private:
+        int noOfNotes = 5;
+    public:
+        chain2()
+        {
+           nextHandler = new chain3();
+        }
+        void canServeAmount(int amt)
+        {
+            //need to serve amt, check if feasible to server? 
+            int noteNeeded = amt/500;
+            if(noteNeeded < noOfNotes)
+            {
+                int remainAmount = amt - (noteNeeded*500);//get 1000
+                cout<<"served "<<noteNeeded<<"for 500 rs"<<endl;
+                if(remainAmount > 0)
+                    nextHandler->canServeAmount(remainAmount);
+            }
+        }
+};
+class chain1 : public base //2000 rs
+{
+    private:
+        int noOfNotes = 5;
+    public:
+        chain1()
+        {
+            nextHandler = new chain2();
+        }
+        void canServeAmount(int amt)
+        {
+            //need to serve amt, check if feasible to server? 
+            int noteNeeded = amt/2000;
+            if(noteNeeded < noOfNotes)
+            {
+                cout<<"served "<<noteNeeded<<"for 2000 rs"<<endl;
+                int remainAmount = amt - (noteNeeded*2000);
+                if(remainAmount > 0)
+                    nextHandler->canServeAmount(remainAmount);
+            }
+        }
+};
+int main()
+{
+    int totalAmount = 3539;
+    base* b = new chain1();
+    b->canServeAmount(totalAmount);
+    return 0;
+}
