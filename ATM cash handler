@@ -2,6 +2,7 @@
 
 ATM - Cash dispenser handler - if we had note 2000, 1000, 500, 10, how exactly it will be handled using chain of respnsibility.
 Below logic has problem if any new node is introduced in market, code changes are needed accordingly.
+Also code isn't scalable. as denomination increases scaling in this can be bit difficult.
 *******************************************************************************/
 #include <iostream>
 using namespace std;
