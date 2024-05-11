@@ -3,44 +3,38 @@
 ATM - Cash dispenser handler - if we had note 2000, 1000, 500, 10, how exactly it will be handled using chain of respnsibility.
 
 *******************************************************************************/
-/******************************************************************************
-
-Welcome to GDB Online.
-  GDB online is an online compiler and debugger tool for C, C++, Python, PHP, Ruby, 
-  C#, OCaml, VB, Perl, Swift, Prolog, Javascript, Pascal, COBOL, HTML, CSS, JS
-  Code, Compile, Run and Debug online from anywhere in world.
-
-*******************************************************************************/
 #include <iostream>
 using namespace std;
-class base //abstract class
+class baseHandler //abstract class
 {
     protected:
         int amount;
-        base* nextHandler;
+        baseHandler* nextHandler;
     public:
-        base(){
+        baseHandler(){
             //cout<<"base can handle"<<endl;
         }
         virtual void canServeAmount(int amt) = 0;
 };
-class CantBeServed: public base
+class CantBeServed: public baseHandler
 {
     public:
-        CantBeServed(){}
+        CantBeServed(baseHandler* obj){
+            nextHandler = obj;
+        }
         void canServeAmount(int amt)
         {
             cout<<"CantBeServed"<<endl;
         }
 };
-class TenHandler : public base//10
+class TenHandler : public baseHandler//10
 {
     private:
         int noOfNotes = 5;
     public:
-        TenHandler()
+        TenHandler(baseHandler* obj)
         {
-            nextHandler = new CantBeServed();  
+            nextHandler = obj;
         }
         void canServeAmount(int amt)
         {
@@ -55,14 +49,14 @@ class TenHandler : public base//10
             }
         }
 };
-class HundredHandler : public base//100
+class HundredHandler : public baseHandler//100
 {
     private:
         int noOfNotes =5;
     public:
-        HundredHandler()
+        HundredHandler(baseHandler* obj)
         {
-            nextHandler = new TenHandler();
+            nextHandler = obj;
         }
         void canServeAmount(int amt)
         {
@@ -77,14 +71,14 @@ class HundredHandler : public base//100
             }
         }
 };
-class FiveHundredHandler : public base//500
+class FiveHundredHandler : public baseHandler//500
 {
     private:
         int noOfNotes = 5;
     public:
-        FiveHundredHandler()
+        FiveHundredHandler(baseHandler* obj)
         {
-           nextHandler = new HundredHandler();
+           nextHandler = obj;
         }
         void canServeAmount(int amt)
         {
@@ -99,14 +93,14 @@ class FiveHundredHandler : public base//500
             }
         }
 };
-class TwoThousandHandler : public base //2000 rs
+class TwoThousandHandler : public baseHandler //2000 rs
 {
     private:
         int noOfNotes = 5;
     public:
-        TwoThousandHandler()
+        TwoThousandHandler(baseHandler* obj)
         {
-            nextHandler = new FiveHundredHandler();
+            nextHandler = obj;
         }
         void canServeAmount(int amt)
         {
@@ -124,7 +118,7 @@ class TwoThousandHandler : public base //2000 rs
 class ATM 
 {
     protected:
-        base* b;
+        baseHandler* b;
     private:
         int TwoThousandCount;
         int FiveHundredCount;
@@ -140,7 +134,7 @@ class ATM
         }
         void withdraw(int amount)
         {
-            b = new TwoThousandHandler();
+            b = new TwoThousandHandler(new FiveHundredHandler(new HundredHandler(new TenHandler(new CantBeServed(NULL)))));
             b->canServeAmount(amount);
         }
 };
@@ -151,4 +145,3 @@ int main()
     a->withdraw(AmountToWithdraw);
     return 0;
 }
-
