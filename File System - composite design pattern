@@ -1,0 +1,71 @@
+/******************************************************************************
+
+File system - uses composite design pattern, used whenever we have tree like structure.
+can also be used for design calculatr.
+*******************************************************************************/
+#include <iostream>
+#include<list>
+using namespace std;
+class fileSystem
+{
+  public:
+    fileSystem()
+    {
+        //cout<<"fileSystem interface"<<endl;
+    }
+    virtual void ls() = 0;
+};
+class file : public fileSystem
+{
+    private:
+        string fileName;
+  public:
+    file(string name)
+    {
+        fileName = name;
+    }
+    void ls()
+    {
+        cout<<"file name: "<<fileName<<endl;
+    }
+};
+class directory : public fileSystem
+{
+    private:
+        string directoryName;
+        list<fileSystem*> directoryList;
+  public:
+    directory(string directory)
+    {
+        this->directoryName = directory;
+        //directoryList = new list<fileSystem>();
+    }
+    void addToDirectory(fileSystem* file)
+    {
+        directoryList.push_back(file);
+    }
+    void ls()
+    {
+        cout<<"printing directory name"<<endl;
+        for(auto dirs : directoryList)
+        {
+            dirs->ls();
+        }
+    }
+};
+int main()
+{
+    directory* movieDirectory = new directory("Romantic");
+    fileSystem* file1 = new file("DDLJ");
+    movieDirectory->addToDirectory(file1);
+    
+    directory* comedy = new directory("Comedy");
+    fileSystem* file2 = new file("hangama");
+    fileSystem* file3 = new file("Mr Mario");
+    comedy->addToDirectory(file2);
+    comedy->addToDirectory(file3);
+    movieDirectory->addToDirectory(comedy);
+    
+    movieDirectory->ls();
+    return 0;
+}
