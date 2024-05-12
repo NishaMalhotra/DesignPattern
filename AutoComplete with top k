@@ -1,0 +1,161 @@
+/******************************************************************************
+
+return top k numbers for a string using trie
+
+*******************************************************************************/
+#include <iostream>
+#include<vector>
+#include<bits/stdc++.h>
+using namespace std;
+struct trieNode
+{
+    trieNode* children[26];
+    bool isEnd;
+    int frequency;
+    
+    trieNode()
+    {
+        isEnd = false;
+        frequency = 0;
+        for(int i=0;    i<26;   i++)
+            children[i] = nullptr;
+    }
+};
+void insertKey(trieNode* root, string key)
+{
+    trieNode* curr = root;
+    for(auto ch: key)
+    {
+        if(curr->children[ch-'a'] == nullptr)
+        {
+            trieNode* newNode = new trieNode();
+            curr->children[ch-'a'] = newNode;
+        }
+        curr = curr->children[ch-'a'];
+        curr->frequency+=1;
+    }
+    curr->isEnd = true;
+}
+bool searchKey(trieNode* root, string key)
+{
+    trieNode* curr = root;
+    for(auto ch:key)
+    {
+        if(curr->children[ch-'a'] != nullptr)
+            curr = curr->children[ch-'a'];
+    }
+    if(curr->isEnd == true)
+        return true;
+        
+    return false;
+        
+}
+bool isEmpty(trieNode* root)
+{
+    for (int i = 0; i < 26; i++)
+        if (root->children[i])
+            return false;
+    return true;
+}
+trieNode* removeKey(trieNode* root, string key,int depth)
+{
+    if(root ==nullptr)
+        return nullptr;
+    
+    if(depth == key.length())
+    {
+        if (root->isEnd)
+            root->isEnd = false;
+ 
+        if (isEmpty(root)) { //not prefix of any other word
+            delete (root);
+            root = NULL;
+        }
+ 
+        return root;
+    }
+    int index = key[depth]-'a';
+    removeKey(root->children[index],key,depth+1);
+    // If root does not have any child (its only child got 
+    // deleted), and it is not end of another word.
+    if(isEmpty(root) && root->isEnd == false)
+    {
+        delete root;
+        root = NULL;
+    }
+    
+}
+//print auto suggestion for given key
+void printSuggestionsRecur(trieNode* root,string key, vector<pair<string,int>>& wordCount)
+{
+    if(root->isEnd)
+        wordCount.push_back({key, root->frequency});
+    for(int i=0;    i<26;   i++)
+    {
+        if(root->children[i])
+        {
+            char nextChild = 'a' + i;
+            printSuggestionsRecur(root->children[i],key+nextChild, wordCount);
+        }
+            
+    }
+}
+bool compare(pair<string,int>& p1, pair<string,int>& p2)
+{
+    return p1.second > p2.second; //sorting based on decreasong ordr.
+}
+void printSuggestions(trieNode* root,string key)
+{
+    trieNode* curr = root;
+    for(auto ch: key)
+    {
+        if(!curr->children[ch - 'a'])
+            return;
+        curr = curr->children[ch-'a'];
+    }
+    
+    if(curr->isEnd) //prefix is available
+    {
+        cout<<key <<"is last node"<<endl;
+       //return -1;
+    }
+    vector<pair<string,int>> wordCount;
+    printSuggestionsRecur(curr,key, wordCount);
+    sort(wordCount.begin(),wordCount.end(),compare);
+    for(auto i=0;   i<2;    i++)
+    {
+        cout<<wordCount[i].first<<"frequency:"<<wordCount[i].second<<endl;
+    }
+    
+}
+int main()
+{
+    trieNode* root = new trieNode();
+    vector<string> inputStrings = { "and", "ant", "anpi", "ant","anttt","ans","ans", "ant", "ant", "ant","anti", "anro", "angh","apt", "apt","apt" };
+    int n = inputStrings.size();
+
+    for (int i = 0; i < n; i++) {
+        insertKey(root, inputStrings[i]);
+    }
+    //removeKey(root,"geek",0);
+    
+    vector<string> searchQueryStrings = { "do", "geek", "bat" };
+    int searchQueries = searchQueryStrings.size();
+
+    for (int i = 0; i < searchQueries; i++) {
+        cout << "Query String: " << searchQueryStrings[i]<< "\n";
+        if (searchKey(root, searchQueryStrings[i])) {
+            // the queryString is present in the Trie
+            cout << "The query string is present in the Trie\n";
+        }
+        else {
+            // the queryString is not present in the Trie
+            cout << "The query string is not present in "
+                    "the Trie\n";
+        }
+    }
+    cout<<"auto suggestion::"<<endl;
+    printSuggestions(root,"an");
+    
+    return 0;
+}
