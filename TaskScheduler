@@ -1,0 +1,218 @@
+/******************************************************************************
+
+Task Scheduler - executes two type of tasks - One Time and Recursive task. 
+Each recursive task is executed after duration of 1 minute.
+
+*******************************************************************************/
+#include <iostream>
+#include <thread>
+#include<bits/stdc++.h>
+using namespace std;
+class executeContext
+{
+    public:
+        virtual void execute() = 0;
+};
+class testContext : public executeContext
+{
+    public:
+        void execute()
+        {
+            cout<<"task running"<<endl;
+        }
+};
+class scheduleTask
+{
+    public:
+        executeContext* context;
+        scheduleTask(executeContext* context)
+        {
+            this->context = context;
+        }
+        virtual bool isRecuring() = 0;
+        void execute()
+        {
+            context->execute();
+        }
+        virtual scheduleTask* nextScheduledTask() = 0;
+        virtual long getNextExecutionTime() const = 0;
+};
+class OneTimeTask : public scheduleTask
+{
+    private:
+        const long executionTime;
+    public:
+        OneTimeTask(executeContext* context, long executionTime) : scheduleTask(context), executionTime(executionTime){}
+        long getNextExecutionTime() const
+        {
+            return executionTime;
+        }
+        bool isRecuring()
+        {
+            return false;
+        }
+        scheduleTask* nextScheduledTask()
+        {
+            return nullptr;
+        }
+};
+
+class recursiveTask : public scheduleTask
+{
+    private:
+        const long executionTime;
+        const long interval;
+    public:
+        recursiveTask(executeContext* context, long executionTime,long interval) 
+            : scheduleTask(context), executionTime(executionTime), interval(interval){}
+        long getNextExecutionTime() const
+        {
+            return executionTime;
+        }
+        bool isRecuring()
+        {
+            return true;
+        }
+        scheduleTask* nextScheduledTask() {
+            return new recursiveTask(context, executionTime + interval, interval);
+        }
+};
+class taskStore
+{
+    public:
+        virtual scheduleTask* peekTask() = 0;
+        virtual scheduleTask* pollTask() = 0;
+        virtual void addTask(scheduleTask* task) = 0;
+        virtual bool removeTask(scheduleTask* task) = 0;
+        virtual bool isEmpty() = 0;
+};
+struct TaskComparator {
+    bool operator()(const scheduleTask* task1, const scheduleTask* task2) const {
+        return task1->getNextExecutionTime() > task2->getNextExecutionTime();
+    }
+};
+class priorityBlockingQueueTaskStore : public taskStore
+{
+    private:
+        priority_queue<scheduleTask*, std::vector<scheduleTask*>, TaskComparator> taskQueue; 
+    public:
+        priorityBlockingQueueTaskStore(int queueSize) {}
+        void addTask(scheduleTask* task)
+        {
+            taskQueue.push(task);
+        }
+        scheduleTask* pollTask()
+        {
+            if(taskQueue.empty())
+                return nullptr;
+            scheduleTask* task = taskQueue.top();
+            taskQueue.pop();
+            return task;
+        }
+        scheduleTask* peekTask()
+        {
+            if(taskQueue.empty())
+                return nullptr;
+            scheduleTask* task = taskQueue.top();
+            return task;
+        }
+        bool removeTask(scheduleTask* task)
+        {
+            return false;
+        }
+        bool isEmpty()
+        {
+            if(taskQueue.empty())
+                return true;
+            return false;
+        }
+};
+class taskRunner
+{
+    private:
+        taskStore* task;
+        bool running;
+    public:
+        taskRunner(taskStore* task)
+        {
+            this->task = task;
+            running = true;
+        }
+        void run()
+        {
+            cout<<"task running started"<<endl;
+            while(running)
+            {
+                scheduleTask* t = task->pollTask();
+                if(t == nullptr)
+                {
+                    running = false;
+                    break;
+                }
+                t->execute();
+                if(t->isRecuring())
+                    task->addTask(t->nextScheduledTask());
+                // Sleep for 1 minute after executing each task
+                this_thread::sleep_for(chrono::minutes(1));
+            }
+            cout<<"Task running STOPPED"<<endl;
+        }
+        void stop()
+        {
+            running = false;
+        }
+};
+// ExecutorConfig class
+//This class represents the configuration for the task scheduler, specifying the number of threads to use.
+class ExecutorConfig {
+private:
+    int numThreads;
+
+public:
+    ExecutorConfig(int numThreads) : numThreads(numThreads) {}
+
+    int getNumThreads() {
+        return numThreads;
+    }
+
+    void setNumThreads(int numThreads) {
+        this->numThreads = numThreads;
+    }
+};
+// TaskScheduler class
+//This class manages a pool of worker threads (TaskRunner instances) to execute tasks concurrently.
+class TaskScheduler {
+private:
+    vector<thread*> threads;
+    taskStore* store;
+
+public:
+    TaskScheduler(ExecutorConfig* executorConfig, taskStore* store) : store(store) {
+        for (int i = 0; i < executorConfig->getNumThreads(); i++) {
+            thread* th = new thread(&taskRunner::run, new taskRunner(store));
+            threads.push_back(th);
+        }
+    }
+
+    void stop() {
+        for (auto t : threads) {
+            t->join();
+            delete t;
+        }
+    }
+};
+int main()
+{
+    ExecutorConfig config(2);
+    taskStore* task = new priorityBlockingQueueTaskStore(100); //queue that can store 100 task created
+    // Add tasks to the store
+    task->addTask(new OneTimeTask(new testContext(), 1000)); // Add a one-time task
+    task->addTask(new recursiveTask(new testContext(), 2000, 1000)); // Add a recurring task
+    
+    TaskScheduler scheduler(&config, task);
+    this_thread::sleep_for(std::chrono::minutes(1)); // Run for 5 seconds
+    
+    scheduler.stop();
+    
+    return 0;
+}
