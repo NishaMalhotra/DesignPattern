@@ -2,6 +2,12 @@
 
 Task Scheduler - executes two type of tasks - One Time and Recursive task. 
 Each recursive task is executed after duration of 1 minute.
+There are Mainly classes
+1) scheduleTask ---> OneTimeTask, recursiveTask (That contains type of task which we need to execute)
+2) taskStore --> priorityBlockingQueueTaskStore (performs activity of adding task in priority queue). 
+3) taskRunner - Would be running task that we added in priority queue, one by one picking all the tasks and executing it.
+4) ExecutorConfig - defines how many threads we want to run.
+5) TaskScheduler - takes object of taskStore and uses taskrunner and execute task runner on threads. 
 
 *******************************************************************************/
 #include <iostream>
