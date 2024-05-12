@@ -1,0 +1,148 @@
+/******************************************************************************
+
+AutoComplete functionality using trie DS 
+
+*******************************************************************************/
+#include <iostream>
+#include<vector>
+using namespace std;
+struct trieNode
+{
+    trieNode* children[26];
+    bool isEnd;
+    
+    trieNode()
+    {
+        isEnd = false;
+        for(int i=0;    i<26;   i++)
+            children[i] = nullptr;
+    }
+};
+void insertKey(trieNode* root, string key)
+{
+    trieNode* curr = root;
+    for(auto ch: key)
+    {
+        if(curr->children[ch-'a'] == nullptr)
+        {
+            trieNode* newNode = new trieNode();
+            curr->children[ch-'a'] = newNode;
+        }
+        curr = curr->children[ch-'a'];
+    }
+    curr->isEnd = true;
+}
+bool searchKey(trieNode* root, string key)
+{
+    trieNode* curr = root;
+    for(auto ch:key)
+    {
+        if(curr->children[ch-'a'] != nullptr)
+            curr = curr->children[ch-'a'];
+    }
+    if(curr->isEnd == true)
+        return true;
+        
+    return false;
+        
+}
+bool isEmpty(trieNode* root)
+{
+    for (int i = 0; i < 26; i++)
+        if (root->children[i])
+            return false;
+    return true;
+}
+trieNode* removeKey(trieNode* root, string key,int depth)
+{
+    if(root ==nullptr)
+        return nullptr;
+    
+    if(depth == key.length())
+    {
+        if (root->isEnd)
+            root->isEnd = false;
+ 
+        if (isEmpty(root)) { //not prefix of any other word
+            delete (root);
+            root = NULL;
+        }
+ 
+        return root;
+    }
+    int index = key[depth]-'a';
+    removeKey(root->children[index],key,depth+1);
+    // If root does not have any child (its only child got 
+    // deleted), and it is not end of another word.
+    if(isEmpty(root) && root->isEnd == false)
+    {
+        delete root;
+        root = NULL;
+    }
+    
+}
+//print auto suggestion for given key
+int printSuggestionsRecur(trieNode* root,string key)
+{
+    if(root->isEnd)
+        cout<<key<<" found"<<endl;
+    for(int i=0;    i<26;   i++)
+    {
+        if(root->children[i])
+        {
+            char nextChild = 'a' + i;
+            printSuggestionsRecur(root->children[i],key+nextChild);
+        }
+            
+    }
+}
+int printSuggestions(trieNode* root,string key)
+{
+    trieNode* curr = root;
+    for(auto ch: key)
+    {
+        if(!curr->children[ch - 'a'])
+            return 0;
+        curr = curr->children[ch-'a'];
+    }
+    
+    if(curr->isEnd) //prefix is available
+    {
+        cout<<key <<"is last node"<<endl;
+        return -1;
+    }
+    printSuggestionsRecur(curr,key);
+    return 1;
+    
+}
+int main()
+{
+    trieNode* root = new trieNode();
+    vector<string> inputStrings = { "and", "ant", "do", "geek", "dad", "ball" };
+    int n = inputStrings.size();
+
+    for (int i = 0; i < n; i++) {
+        insertKey(root, inputStrings[i]);
+    }
+    //removeKey(root,"geek",0);
+    
+    vector<string> searchQueryStrings = { "do", "geek", "bat" };
+    int searchQueries = searchQueryStrings.size();
+
+    for (int i = 0; i < searchQueries; i++) {
+        cout << "Query String: " << searchQueryStrings[i]<< "\n";
+        if (searchKey(root, searchQueryStrings[i])) {
+            // the queryString is present in the Trie
+            cout << "The query string is present in the Trie\n";
+        }
+        else {
+            // the queryString is not present in the Trie
+            cout << "The query string is not present in "
+                    "the Trie\n";
+        }
+    }
+    cout<<"auto suggestion::"<<endl;
+    printSuggestions(root,"an");
+    
+    return 0;
+}
