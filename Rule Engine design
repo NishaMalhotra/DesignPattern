@@ -1,0 +1,121 @@
+/*
+Reference - https://tenmilesquare.com/resources/software-development/basic-rules-engine-design-pattern/
+https://yiniski.medium.com/rule-engine-pattern-8a3f0e0c2d81
+https://yiniski.medium.com/rule-engine-pattern-part-2-function-as-first-class-citizen-f0f8b35d1efd
+Design Rule Engine - 
+
+*/
+#include<iostream>
+#include<vector>
+#include<string>
+using namespace std;
+enum RecordingVersion {v1,v2};
+class Recording
+{
+  public:
+    RecordingVersion version;
+    string title;
+    string composer;
+    string duration;
+    string artist;
+    string lyrics;
+    
+   Recording(string title,string composer,string duration,string artist,string lyrics)
+   {
+       this->title = title;
+       this->composer = composer;
+       this->duration = duration;
+       this->artist = artist;
+       this->lyrics = lyrics;
+   }
+};
+class RuleInterface
+{
+    public:
+        virtual bool shouldRun(Recording* rec) = 0;
+        virtual vector<string> runRule(Recording* rec) = 0;
+};
+
+class Rule1 : public RuleInterface
+{
+    public:
+        Rule1(){}
+        bool shouldRun(Recording* rec)
+        {
+            return (RecordingVersion::v1 == rec->version);
+        }
+        vector<string> runRule(Recording* rec)
+        {
+            vector<string> errors;
+            if(rec->title.empty())
+                errors.push_back("recording title is empty");
+            if(rec->artist.empty())
+                errors.push_back("recording artist is empty");
+            return errors;
+        }
+};
+class Rule2 : public RuleInterface
+{
+    public:
+        Rule2(){}
+        bool shouldRun(Recording* rec)
+        {
+            return RecordingVersion::v2 == rec->version;
+        }
+        vector<string> runRule(Recording* rec)
+        {
+            vector<string> errors;
+            if(rec->title.empty())
+                errors.push_back("recording title is empty");
+            if(rec->artist.empty())
+                errors.push_back("recording artist is empty");
+            if(rec->composer.empty())
+                errors.push_back("recording composer is empty");
+            return errors;
+        }
+};
+class Validator
+{
+    public:
+        Validator(){
+            rules.push_back(new Rule1());
+            rules.push_back(new Rule2());
+        }
+        vector<string> validateRecordings(Recording* r)
+        {
+            if(r == NULL)
+                cout<<"Recording is null"<<endl;
+            vector<string> errors;
+            for(auto rule : rules)
+            {
+                if(rule->shouldRun(r))
+                {
+                    vector<string> ruleErrors = rule->runRule(r);
+                    errors.insert(errors.end(),ruleErrors.begin(),ruleErrors.end());
+                }
+            }
+            return errors;
+        }
+    private:
+        vector<RuleInterface*> rules;
+};
+int main()
+{
+    // Create a Recording object
+    Recording *recording2 = new Recording("","Sample Composer","","Sample Artist","");
+    Recording *recording = new Recording("","Sample Composer","","","");
+    // Create an instance of Validator
+    Validator validator;
+    // Validate the recording
+    vector<string> errors = validator.validateRecordings(recording);
+
+    // Display validation errors
+    if (!errors.empty()) {
+        std::cout << "Validation failed with the following errors:" << std::endl;
+        for (const auto& error : errors) {
+            std::cout << "- " << error << std::endl;
+        }
+    } else {
+        std::cout << "Validation passed!" << std::endl;
+    }
+}
