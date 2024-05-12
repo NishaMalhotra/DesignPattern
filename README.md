@@ -19,3 +19,6 @@
 # RateLimiter: 
 
 ![image](https://github.com/NishaMalhotra/DesignPattern/assets/39948171/e706f7a8-44a3-4b86-83b3-bb0e86a253d4)
+
+# Task Scheduler:
+![image](https://github.com/NishaMalhotra/DesignPattern/assets/39948171/b5b2cb5c-20cf-4203-a954-acfc3ebdaa17)
