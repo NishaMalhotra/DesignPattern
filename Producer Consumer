@@ -1,0 +1,83 @@
+/*
+Producer consumer design problem. 
+Buffer created having max capacity of 10. keep left & rigt index to keep track of buffer q.
+ProduceNumber - produces random number & calls produce function to add thread number & number generated.
+Produce funcion acquires lock, & verify if buffer is full & inform notfull conditon variable as soon as some space is available in buffer. add elemnt at last & notify using notEmpty cv.
+#include <iostream>
+#include<vector>
+#include<bits/stdc++.h>
+#include<mutex>
+#include<condition_variable>
+
+#define bufferCapacity 10
+using namespace std;
+class Buffer 
+{
+    private:
+        vector<int> buffer;//circular buffer
+        int bufferSize;
+        int left, right;
+        mutex mtx;
+        condition_variable notEmpty;
+        condition_variable notFull;
+    public:
+        void produce(int threadId, int num);
+        int consume(int threadId);
+        Buffer(); //ctr
+};
+Buffer::Buffer(): buffer(bufferCapacity), left(0), right(0), bufferSize(0) {}
+void Buffer::produce(int threadId,int num)
+{
+    unique_lock<mutex> lock(mtx); //acquire unique lock
+    cout<<"thread id:"<<threadId<<"produced :"<<num<<endl;
+    
+    notFull.wait(lock, [this](){ //wait if buffer is full
+       return (bufferSize!= bufferCapacity);
+    });
+    buffer[right] = num;
+    right = (right+1)%bufferCapacity;
+    bufferSize+=1;
+    
+    notEmpty.notify_all(); //notify that buffer thread isnt empty
+}
+int Buffer::consume(int threadId)
+{
+    unique_lock<mutex> lock(mtx); //acquire lock
+    notEmpty.wait(lock,[this](){ //wait till buffer is empty
+        return (bufferSize!=0);
+    });
+    
+    int output = buffer[left];
+    cout<<"threadId : "<<threadId<<" consumed value: "<<output<<endl;
+    left = (left+1)%bufferCapacity;
+    
+    notFull.notify_one();
+    return output;
+}
+void produceNumber(Buffer& buffer)
+{
+    for(int i=0;    i<4;    i++)
+    {
+        int number = rand()%10+1;
+        buffer.produce(i,number);
+        this_thread::sleep_for(chrono::milliseconds(100));
+    }
+}
+void consumeNumber(Buffer& buffer)
+{
+    for(int i=0;    i<6;    i++)
+    {
+        buffer.consume(i);
+        this_thread::sleep_for(chrono::milliseconds(100));
+    }
+}
+int main()
+{
+    Buffer buffer;
+    thread producerThread(produceNumber,ref(buffer));
+    thread consumerThread(consumeNumber,ref(buffer));
+    
+    producerThread.join();
+    consumerThread.join();
+    return 0;
+}
